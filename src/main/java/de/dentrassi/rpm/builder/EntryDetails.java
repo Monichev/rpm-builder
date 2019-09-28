@@ -1,21 +1,23 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 IBH SYSTEMS GmbH and others.
+ * Copyright (c) 2016, 2019 IBH SYSTEMS GmbH and others.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-2.0
  *
  * Contributors:
  *     IBH SYSTEMS GmbH - initial API and implementation
  *     Red Hat Inc - add new file flags
+ *     Peter Wilkinson - add skip entry flag
+ *     Oliver Matz - add verify flags
  *******************************************************************************/
 package de.dentrassi.rpm.builder;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.eclipse.packagedrone.utils.rpm.FileFlags;
-import org.eclipse.packagedrone.utils.rpm.build.FileInformation;
+import org.eclipse.packager.rpm.FileFlags;
+import org.eclipse.packager.rpm.build.FileInformation;
 
 public class EntryDetails
 {
@@ -38,6 +40,40 @@ public class EntryDetails
     private String user;
 
     private String group;
+
+    private Boolean skip = false;
+
+    /**
+     * Controls verify flags.
+     * If null, the behavior is unchanged, the verify flags bitmap will be set
+     * to -1, meaning: verify everything.
+     * If (for example) empty, the verify flags bitmap will be set to 0,
+     * meaning: verify nothing.
+     * See https://github.com/ctron/rpm-builder/issues/41.
+     * <br>
+     * The following combination is a reasonable example in the sense of
+     * https://stackoverflow.com/a/38996621/11917731:
+     * <entry>
+     * ...
+     * <configuration>true</configuration>
+     * <noreplace>true</noreplace>
+     * <verify>
+     * <user>true</user>
+     * <group>true</group>
+     * </verify>
+     * </entry>
+     */
+    private VerifyDetails verify;
+
+    public final VerifyDetails getVerify ()
+    {
+        return this.verify;
+    }
+
+    public final void setVerify ( final VerifyDetails verify )
+    {
+        this.verify = verify;
+    }
 
     public void setMode ( final String mode )
     {
@@ -139,6 +175,16 @@ public class EntryDetails
         return this.group;
     }
 
+    public void setSkip ( final Boolean skip )
+    {
+        this.skip = skip;
+    }
+
+    public Boolean getSkip ()
+    {
+        return this.skip;
+    }
+
     public void validate ()
     {
     }
@@ -195,6 +241,11 @@ public class EntryDetails
         if ( this.mode != null )
         {
             info.setMode ( this.mode );
+            didApply = true;
+        }
+        if ( this.verify != null )
+        {
+            this.verify.apply ( info );
             didApply = true;
         }
         return didApply;

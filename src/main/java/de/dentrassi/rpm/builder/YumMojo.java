@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2016, 2017 IBH SYSTEMS GmbH and others.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-2.0
  *
  * Contributors:
  *     IBH SYSTEMS GmbH - initial API and implementation
@@ -15,7 +15,7 @@
 package de.dentrassi.rpm.builder;
 
 import static java.util.Collections.singletonMap;
-import static org.eclipse.packagedrone.utils.rpm.HashAlgorithm.SHA256;
+import static org.eclipse.packager.rpm.HashAlgorithm.SHA256;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,16 +45,16 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.bouncycastle.openpgp.PGPPrivateKey;
-import org.eclipse.packagedrone.utils.io.FileSystemSpoolOutTarget;
-import org.eclipse.packagedrone.utils.rpm.HashAlgorithm;
-import org.eclipse.packagedrone.utils.rpm.info.RpmInformation;
-import org.eclipse.packagedrone.utils.rpm.info.RpmInformations;
-import org.eclipse.packagedrone.utils.rpm.parse.RpmInputStream;
-import org.eclipse.packagedrone.utils.rpm.yum.RepositoryCreator;
-import org.eclipse.packagedrone.utils.rpm.yum.RepositoryCreator.Builder;
-import org.eclipse.packagedrone.utils.rpm.yum.RepositoryCreator.Context;
-import org.eclipse.packagedrone.utils.rpm.yum.RepositoryCreator.FileInformation;
-import org.eclipse.packagedrone.utils.security.pgp.SigningStream;
+import org.eclipse.packager.io.FileSystemSpoolOutTarget;
+import org.eclipse.packager.rpm.HashAlgorithm;
+import org.eclipse.packager.rpm.info.RpmInformation;
+import org.eclipse.packager.rpm.info.RpmInformations;
+import org.eclipse.packager.rpm.parse.RpmInputStream;
+import org.eclipse.packager.rpm.yum.RepositoryCreator;
+import org.eclipse.packager.rpm.yum.RepositoryCreator.Builder;
+import org.eclipse.packager.rpm.yum.RepositoryCreator.Context;
+import org.eclipse.packager.rpm.yum.RepositoryCreator.FileInformation;
+import org.eclipse.packager.security.pgp.SigningStream;
 
 import com.google.common.collect.Lists;
 
@@ -135,12 +135,31 @@ public class YumMojo extends AbstractMojo
     @Parameter ( property = "rpm.skipDependencies", defaultValue = "false" )
     private boolean skipDependencies = false;
 
+    /**
+     * Disable the mojo altogether.
+     *
+     * @since 1.1.1
+     */
+    @Parameter ( property = "yum.skip", defaultValue = "false" )
+    private boolean skip;
+
+    public void setSkip ( final boolean skip )
+    {
+        this.skip = skip;
+    }
+
     private Logger logger;
 
     @Override
     public void execute () throws MojoExecutionException, MojoFailureException
     {
         this.logger = new Logger ( getLog () );
+
+        if ( this.skip )
+        {
+            this.logger.debug ( "Skipping execution" );
+            return;
+        }
 
         try
         {
@@ -170,9 +189,9 @@ public class YumMojo extends AbstractMojo
                 if ( deps != null )
                 {
                     paths.addAll ( deps.stream ()//
-                    .filter ( d -> d.getType ().equalsIgnoreCase ( "rpm" ) )//
-                    .map ( d -> d.getFile ().toPath () )//
-                    .collect ( Collectors.toList () ) );
+                            .filter ( d -> d.getType ().equalsIgnoreCase ( "rpm" ) )//
+                            .map ( d -> d.getFile ().toPath () )//
+                            .collect ( Collectors.toList () ) );
                 }
             }
             else

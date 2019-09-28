@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2016 IBH SYSTEMS GmbH and others.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-2.0
  *
  * Contributors:
  *     IBH SYSTEMS GmbH - initial API and implementation
@@ -18,7 +18,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
-import org.eclipse.packagedrone.utils.security.pgp.PgpHelper;
+import org.eclipse.packager.security.pgp.PgpHelper;
 
 public final class SigningHelper
 {

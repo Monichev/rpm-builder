@@ -19,6 +19,7 @@
 			<item name="Signing" href="signing.html" />
 			<item name="Naming" href="naming.html" />
 			<item name="Lead information" href="lead.html" />
+			<item name="Verification flags" href="verify.html" />
 		</menu>
 
 		<menu ref="reports" />
@@ -26,7 +27,7 @@
 	<skin>
 		<groupId>org.apache.maven.skins</groupId>
 		<artifactId>maven-fluido-skin</artifactId>
-		<version>1.7</version>
+		<version>1.8</version>
 	</skin>
 	<custom>
 		<fluidoSkin>
